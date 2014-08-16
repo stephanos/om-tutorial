@@ -21,16 +21,4 @@
                 :output-to "app.js"
                 :output-dir "out"
                 :optimizations :none
-                :source-map true}}
-             {:id "release"
-              :source-paths ["src"]
-              :compiler {
-                :output-to "app.js"
-                :optimizations :advanced
-                :elide-asserts true
-                :pretty-print false
-                :output-wrapper false
-                :preamble ["react/react.min.js"]
-                :externs ["react/react.js"]
-                :closure-warnings {:externs-validation :off
-                                   :non-standard-jsdoc :off}}}]})
+                :source-map true}}]})
