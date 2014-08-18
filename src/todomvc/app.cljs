@@ -124,8 +124,6 @@
     :cancel  (cancel-action app)
     nil))
 
-(def render-start nil)
-
 (defn todo-app [{:keys [todos] :as app} owner]
   (reify
     om/IWillMount
@@ -135,8 +133,6 @@
         (go (while true
               (let [[type value] (<! comm)]
                 (handle-event type app value))))))
-    om/IWillUpdate
-    (will-update [_ _ _] (set! render-start (now)))
     om/IDidUpdate
     (did-update [_ _ _]
       (store "todos" todos))
