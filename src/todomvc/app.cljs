@@ -1,11 +1,10 @@
 (ns todomvc.app
-  (:require-macros [cljs.core.async.macros :refer [go]]
-                   [secretary.macros :refer [defroute]])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [goog.events :as events]
             [cljs.core.async :refer [put! <! chan]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [secretary.core :as secretary]
+						[secretary.core :as secretary :include-macros true :refer [defroute]]
             [todomvc.utils :refer [pluralize now guid store hidden]]
             [clojure.string :as string]
             [todomvc.item :as item])
