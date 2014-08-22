@@ -20,9 +20,11 @@
 ;; =============================================================================
 ;; Routing
 
-(defroute "/" [] (swap! app-state assoc :showing :all))
+(defroute "/" []
+	(swap! app-state assoc :showing :all))
 
-(defroute "/:filter" [filter] (swap! app-state assoc :showing (keyword filter)))
+(defroute "/:filter" [filter]
+	(swap! app-state assoc :showing (keyword filter)))
 
 (def history (History.))
 
@@ -104,11 +106,14 @@
     (fn [todos] (into [] (remove #(= (:id %) id) todos)))
     [:delete id]))
 
-(defn edit-todo [state {:keys [id]}] (om/update! state :editing id))
+(defn edit-todo [state {:keys [id]}]
+	(om/update! state :editing id))
 
-(defn save-todos [state] (om/update! state :editing nil))
+(defn save-todos [state]
+	(om/update! state :editing nil))
 
-(defn cancel-action [state] (om/update! state :editing nil))
+(defn cancel-action [state]
+	(om/update! state :editing nil))
 
 (defn clear-completed [state]
   (om/transact! state :todos
