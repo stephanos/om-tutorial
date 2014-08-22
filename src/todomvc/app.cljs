@@ -63,7 +63,7 @@
                  (= (:id todo) editing) (assoc :editing true)
                  (not (visible? todo showing)) (assoc :hidden true)))}))))
 
-(defn footer [{:keys [todos] :as state} comm]
+(defn footer [{:keys [todos] :as state}]
   (let [count (count (remove :completed todos))
 				sel   (-> (zipmap [:all :active :completed] (repeat ""))
                   (assoc (:showing state) "selected"))]
@@ -153,7 +153,7 @@
 							 :placeholder "What needs to be done?"
 							 :onKeyDown #(enter-new-todo % state owner)})
 				(main state comm)
-				(footer state comm)))))
+				(footer state)))))
 
 (om/root todo-app app-state
   {:target (.getElementById js/document "todoapp")})
