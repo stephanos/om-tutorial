@@ -44,6 +44,11 @@
     :active (not (:completed todo))
     :completed (:completed todo)))
 
+(defn header []
+	(dom/header #js {:id "header"}
+		(dom/h1 nil "todos")
+	))
+
 (defn main [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
     (dom/input
@@ -133,9 +138,7 @@
       (let [active    (count (remove :completed todos))
             completed (- (count todos) active)]
         (dom/div nil
-					(dom/header #js {:id "header"}
-						(dom/h1 nil "todos")
-					)
+					(header)
 					(dom/input
 						#js {:ref "newField" :id "new-todo"
 								 :placeholder "What needs to be done?"
