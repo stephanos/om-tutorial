@@ -34,7 +34,7 @@
 (.setEnabled history true)
 
 ;; =============================================================================
-;; Main and Footer Components
+;; Sub-Components
 
 (declare toggle-all)
 
@@ -48,7 +48,7 @@
 	(dom/header #js {:id "header"}
 		(dom/h1 nil "todos")))
 
-(defn main [{:keys [todos showing editing] :as state} comm]
+(defn list [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
     (dom/input
       #js {:id "toggle-all" :type "checkbox"
@@ -152,7 +152,7 @@
 					#js {:id "new-todo" :ref "newField"
 							 :placeholder "What needs to be done?"
 							 :onKeyDown #(enter-new-todo % state owner)})
-				(main state comm)
+				(list state comm)
 				(footer state)))))
 
 (om/root todo-app app-state
