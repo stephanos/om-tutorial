@@ -142,14 +142,15 @@
       (let [active    (count (remove :completed todos))
             completed (- (count todos) active)]
         (dom/div nil
-          (dom/header #js {:id "header"}
-            (dom/h1 nil "todos")
-            (dom/input
-              #js {:ref "newField" :id "new-todo"
-                   :placeholder "What needs to be done?"
-                   :onKeyDown #(handle-new-todo-keydown % state owner)})
-            (main state comm)
-            (footer state active completed comm)))))))
+					(dom/header #js {:id "header"}
+						(dom/h1 nil "todos")
+					)
+					(dom/input
+						#js {:ref "newField" :id "new-todo"
+								 :placeholder "What needs to be done?"
+								 :onKeyDown #(handle-new-todo-keydown % state owner)})
+					(main state comm)
+					(footer state active completed comm))))))
 
 (om/root todo-app app-state
   {:target (.getElementById js/document "todoapp")})
