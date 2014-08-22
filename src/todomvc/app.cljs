@@ -132,10 +132,12 @@
         (go (while true
               (let [[type value] (<! comm)]
                 (handle-event type state value))))))
-    om/IDidUpdate
+
+		om/IDidUpdate
     (did-update [_ _ _]
       (store "todos" todos))
-    om/IRenderState
+
+		om/IRenderState
     (render-state [_ {:keys [comm]}]
       (let [active    (count (remove :completed todos))
             completed (- (count todos) active)]

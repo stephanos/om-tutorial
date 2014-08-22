@@ -50,7 +50,8 @@
     om/IInitState
     (init-state [_]
       {:edit-text (:title todo)})
-    om/IDidUpdate
+
+		om/IDidUpdate
     (did-update [_ _ _]
       (when (and (:editing todo)
                  (om/get-state owner :needs-focus))
@@ -59,7 +60,8 @@
           (.focus node)
           (.setSelectionRange node len len))
         (om/set-state! owner :needs-focus nil)))
-    om/IRenderState
+
+		om/IRenderState
     (render-state [_ {:keys [comm] :as state}]
       (let [class (cond-> ""
                     (:completed todo) (str "completed")
