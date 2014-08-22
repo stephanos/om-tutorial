@@ -46,8 +46,7 @@
 
 (defn header []
 	(dom/header #js {:id "header"}
-		(dom/h1 nil "todos")
-	))
+		(dom/h1 nil "todos")))
 
 (defn main [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
@@ -64,10 +63,11 @@
                  (= (:id todo) editing) (assoc :editing true)
                  (not (visible? todo showing)) (assoc :hidden true)))}))))
 
-(defn footer [state count]
-  (let [sel (-> (zipmap [:all :active :completed] (repeat ""))
-                (assoc (:showing state) "selected"))]
-    (dom/footer #js {:id "footer" :style (hidden (empty? (:todos state)))}
+(defn footer [{:keys [todos] :as state} comm]
+  (let [count (count (remove :completed todos))
+				sel   (-> (zipmap [:all :active :completed] (repeat ""))
+                  (assoc (:showing state) "selected"))]
+    (dom/footer #js {:id "footer" :style (hidden (empty? todos))}
       (dom/span #js {:id "todo-count"}
         (dom/strong nil count)
         (str " " (pluralize count "item") " left"))
@@ -75,6 +75,17 @@
         (dom/li nil (dom/a #js {:href "#/" :className (sel :all)} "All"))
         (dom/li nil (dom/a #js {:href "#/active" :className (sel :active)} "Active"))
         (dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
+
+(defn render-disclaimer []
+	(dom/render
+		(dom/div nil
+			(dom/p nil "Double-click to edit a todo")
+			(dom/p nil
+				(dom/a #js {:href "http://github.com/swannodette"}))
+			(dom/p nil
+				#js ["Part of"
+						 (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
+		(.getElementById js/document "info")))
 
 ;; =============================================================================
 ;; Todos
@@ -135,26 +146,16 @@
 
 		om/IRenderState
     (render-state [_ {:keys [comm]}]
-      (let [active    (count (remove :completed todos))
-            completed (- (count todos) active)]
-        (dom/div nil
-					(header)
-					(dom/input
-						#js {:ref "newField" :id "new-todo"
-								 :placeholder "What needs to be done?"
-								 :onKeyDown #(enter-new-todo % state owner)})
-					(main state comm)
-					(footer state active completed comm))))))
+			(dom/div nil
+				(header)
+				(dom/input
+					#js {:id "new-todo" :ref "newField"
+							 :placeholder "What needs to be done?"
+							 :onKeyDown #(enter-new-todo % state owner)})
+				(main state comm)
+				(footer state comm)))))
 
 (om/root todo-app app-state
   {:target (.getElementById js/document "todoapp")})
 
-(dom/render
-  (dom/div nil
-    (dom/p nil "Double-click to edit a todo")
-    (dom/p nil
-      (dom/a #js {:href "http://github.com/swannodette"}))
-    (dom/p nil
-      #js ["Part of"
-           (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
-  (.getElementById js/document "info"))
+(render-disclaimer)
