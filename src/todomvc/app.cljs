@@ -59,16 +59,8 @@
                  (= (:id todo) editing) (assoc :editing true)
                  (not (visible? todo showing)) (assoc :hidden true)))}))))
 
-(defn make-clear-button [completed comm]
-  (when (pos? completed)
-    (dom/button
-      #js {:id "clear-completed"
-           :onClick #(put! comm [:clear (now)])}
-      (str "Clear completed (" completed ")"))))
-
-(defn footer [state count completed comm]
-  (let [clear-button (make-clear-button completed comm)
-        sel (-> (zipmap [:all :active :completed] (repeat ""))
+(defn footer [state count completed]
+  (let [sel (-> (zipmap [:all :active :completed] (repeat ""))
                 (assoc (:showing state) "selected"))]
     (dom/footer #js {:id "footer" :style (hidden (empty? (:todos state)))}
       (dom/span #js {:id "todo-count"}
@@ -77,8 +69,7 @@
       (dom/ul #js {:id "filters"}
         (dom/li nil (dom/a #js {:href "#/" :className (sel :all)} "All"))
         (dom/li nil (dom/a #js {:href "#/active" :className (sel :active)} "Active"))
-        (dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed")))
-      clear-button)))
+        (dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
 
 ;; =============================================================================
 ;; Todos
@@ -115,16 +106,11 @@
 (defn cancel-action [state]
 	(om/update! state :editing nil))
 
-(defn clear-completed [state]
-  (om/transact! state :todos
-    (fn [todos] (into [] (remove :completed todos)))))
-
 (defn handle-event [type state val]
   (case type
     :destroy (destroy-todo state val)
     :edit    (edit-todo state val)
     :save    (save-todos state)
-    :clear   (clear-completed state)
     :cancel  (cancel-action state)
     nil))
 
