@@ -59,7 +59,7 @@
                  (= (:id todo) editing) (assoc :editing true)
                  (not (visible? todo showing)) (assoc :hidden true)))}))))
 
-(defn footer [state count completed]
+(defn footer [state count]
   (let [sel (-> (zipmap [:all :active :completed] (repeat ""))
                 (assoc (:showing state) "selected"))]
     (dom/footer #js {:id "footer" :style (hidden (empty? (:todos state)))}
