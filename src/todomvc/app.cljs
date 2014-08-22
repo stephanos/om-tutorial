@@ -88,7 +88,7 @@
     (om/transact! state :todos
       (fn [todos] (vec (map #(assoc % :completed checked) todos))))))
 
-(defn handle-new-todo-keydown [e state owner]
+(defn enter-new-todo [e state owner]
   (when (== (.-which e) ENTER_KEY)
     (let [new-field (om/get-node owner "newField")]
       (when-not (string/blank? (.. new-field -value trim))
@@ -153,7 +153,7 @@
 					(dom/input
 						#js {:ref "newField" :id "new-todo"
 								 :placeholder "What needs to be done?"
-								 :onKeyDown #(handle-new-todo-keydown % state owner)})
+								 :onKeyDown #(enter-new-todo % state owner)})
 					(main state comm)
 					(footer state active completed comm))))))
 
