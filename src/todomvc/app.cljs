@@ -42,11 +42,11 @@
     :active (not (:completed todo))
     :completed (:completed todo)))
 
-(defn main [{:keys [todos showing editing] :as app} comm]
+(defn main [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
     (dom/input
       #js {:id "toggle-all" :type "checkbox"
-           :onChange #(toggle-all % app)
+           :onChange #(toggle-all % state)
            :checked (every? :completed todos)})
     (apply dom/ul #js {:id "todo-list"}
       (om/build-all item/todo-item todos
@@ -64,11 +64,11 @@
            :onClick #(put! comm [:clear (now)])}
       (str "Clear completed (" completed ")"))))
 
-(defn footer [app count completed comm]
+(defn footer [state count completed comm]
   (let [clear-button (make-clear-button completed comm)
         sel (-> (zipmap [:all :active :completed] (repeat ""))
-                (assoc (:showing app) "selected"))]
-    (dom/footer #js {:id "footer" :style (hidden (empty? (:todos app)))}
+                (assoc (:showing state) "selected"))]
+    (dom/footer #js {:id "footer" :style (hidden (empty? (:todos state)))}
       (dom/span #js {:id "todo-count"}
         (dom/strong nil count)
         (str " " (pluralize count "item") " left"))
@@ -81,49 +81,49 @@
 ;; =============================================================================
 ;; Todos
 
-(defn toggle-all [e app]
+(defn toggle-all [e state]
   (let [checked (.. e -target -checked)]
-    (om/transact! app :todos
+    (om/transact! state :todos
       (fn [todos] (vec (map #(assoc % :completed checked) todos))))))
 
-(defn handle-new-todo-keydown [e app owner]
+(defn handle-new-todo-keydown [e state owner]
   (when (== (.-which e) ENTER_KEY)
     (let [new-field (om/get-node owner "newField")]
       (when-not (string/blank? (.. new-field -value trim))
         (let [new-todo {:id (guid)
                         :title (.-value new-field)
                         :completed false}]
-          (om/transact! app :todos
+          (om/transact! state :todos
             #(conj % new-todo)
             [:create new-todo]))
         (set! (.-value new-field) "")))
     false))
 
-(defn destroy-todo [app {:keys [id]}]
-  (om/transact! app :todos
+(defn destroy-todo [state {:keys [id]}]
+  (om/transact! state :todos
     (fn [todos] (into [] (remove #(= (:id %) id) todos)))
     [:delete id]))
 
-(defn edit-todo [app {:keys [id]}] (om/update! app :editing id))
+(defn edit-todo [state {:keys [id]}] (om/update! state :editing id))
 
-(defn save-todos [app] (om/update! app :editing nil))
+(defn save-todos [state] (om/update! state :editing nil))
 
-(defn cancel-action [app] (om/update! app :editing nil))
+(defn cancel-action [state] (om/update! state :editing nil))
 
-(defn clear-completed [app]
-  (om/transact! app :todos
+(defn clear-completed [state]
+  (om/transact! state :todos
     (fn [todos] (into [] (remove :completed todos)))))
 
-(defn handle-event [type app val]
+(defn handle-event [type state val]
   (case type
-    :destroy (destroy-todo app val)
-    :edit    (edit-todo app val)
-    :save    (save-todos app)
-    :clear   (clear-completed app)
-    :cancel  (cancel-action app)
+    :destroy (destroy-todo state val)
+    :edit    (edit-todo state val)
+    :save    (save-todos state)
+    :clear   (clear-completed state)
+    :cancel  (cancel-action state)
     nil))
 
-(defn todo-app [{:keys [todos] :as app} owner]
+(defn todo-app [{:keys [todos] :as state} owner]
   (reify
     om/IWillMount
     (will-mount [_]
@@ -131,7 +131,7 @@
         (om/set-state! owner :comm comm)
         (go (while true
               (let [[type value] (<! comm)]
-                (handle-event type app value))))))
+                (handle-event type state value))))))
     om/IDidUpdate
     (did-update [_ _ _]
       (store "todos" todos))
@@ -145,9 +145,9 @@
             (dom/input
               #js {:ref "newField" :id "new-todo"
                    :placeholder "What needs to be done?"
-                   :onKeyDown #(handle-new-todo-keydown % app owner)})
-            (main app comm)
-            (footer app active completed comm)))))))
+                   :onKeyDown #(handle-new-todo-keydown % state owner)})
+            (main state comm)
+            (footer state active completed comm)))))))
 
 (om/root todo-app app-state
   {:target (.getElementById js/document "todoapp")})
