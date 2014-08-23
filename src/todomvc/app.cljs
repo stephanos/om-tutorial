@@ -48,7 +48,7 @@
 	(dom/header #js {:id "header"}
 		(dom/h1 nil "todos")))
 
-(defn list [{:keys [todos showing editing] :as state} comm]
+(defn listing [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
     (dom/input
       #js {:id "toggle-all" :type "checkbox"
@@ -152,7 +152,7 @@
 					#js {:id "new-todo" :ref "newField"
 							 :placeholder "What needs to be done?"
 							 :onKeyDown #(enter-new-todo % state owner)})
-				(list state comm)
+				(listing state comm)
 				(footer state)))))
 
 (om/root todo-app app-state
