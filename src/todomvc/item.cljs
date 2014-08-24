@@ -23,6 +23,9 @@
       (put! comm [:destroy @todo])))
   false)
 
+(defn destroy [e todo comm]
+	(put! comm [:destroy @todo]))
+
 (defn edit [e todo owner comm]
   (let [todo @todo
         node (om/get-node owner "editField")]
@@ -77,7 +80,7 @@
               (:title todo))
             (dom/button
               #js {:className "destroy"
-                   :onClick (fn [_] (put! comm [:destroy @todo]))}))
+                   :onClick #(destroy % todo comm)}))
           (dom/input
             #js {:ref "editField" :className "edit"
                  :value (om/get-state owner :edit-text)
