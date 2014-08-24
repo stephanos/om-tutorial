@@ -49,10 +49,11 @@
 
 (defn enter-new-todo [e state owner]
 	(when (== (.-which e) ENTER_KEY)
-		(let [new-field (om/get-node owner "newField")]
-			(when-not (string/blank? (.. new-field -value trim))
+		(let [new-field 		 (om/get-node owner "newField")
+					new-field-text (string/trim (.-value new-field))]
+			(when-not (string/blank? new-field-text)
 				(let [new-todo {:id (guid)
-												:title (.-value new-field)
+												:title new-field-text
 												:completed false}]
 					(om/transact! state :todos
 						#(conj % new-todo)
