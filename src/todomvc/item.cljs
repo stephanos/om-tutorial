@@ -23,7 +23,10 @@
       (put! comm [:destroy @todo])))
   false)
 
-(defn destroy [e todo comm]
+(defn complete [todo]
+	(om/transact! todo :completed #(not %)))
+
+(defn destroy [todo comm]
 	(put! comm [:destroy @todo]))
 
 (defn edit [e todo owner comm]
@@ -46,7 +49,7 @@
   (om/set-state! owner :edit-text (.. e -target -value)))
 
 ;; -----------------------------------------------------------------------------
-;; Todo Item
+;; Component
 
 (defn todo-item [todo owner]
   (reify
@@ -74,13 +77,13 @@
             (dom/input
               #js {:className "toggle" :type "checkbox"
                    :checked (and (:completed todo) "checked")
-                   :onChange (fn [_] (om/transact! todo :completed #(not %)))})
+                   :onChange #(complete todo)})
             (dom/label
               #js {:onDoubleClick #(edit % todo owner comm)}
-              (:title todo))
+              	(:title todo))
             (dom/button
               #js {:className "destroy"
-                   :onClick #(destroy % todo comm)}))
+                   :onClick #(destroy todo comm)}))
           (dom/input
             #js {:ref "editField" :className "edit"
                  :value (om/get-state owner :edit-text)

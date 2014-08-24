@@ -15,6 +15,9 @@
 
 (def ENTER_KEY 13)
 
+;; =============================================================================
+;; State
+
 (def app-state (atom {:showing :all :todos []}))
 
 ;; =============================================================================
@@ -34,9 +37,53 @@
 (.setEnabled history true)
 
 ;; =============================================================================
-;; Sub-Components
+;; Todo App
 
-(declare toggle-all)
+;; -----------------------------------------------------------------------------
+;; Event Handlers
+
+(defn toggle-all [e state]
+	(let [checked (.. e -target -checked)]
+		(om/transact! state :todos
+			(fn [todos] (vec (map #(assoc % :completed checked) todos))))))
+
+(defn enter-new-todo [e state owner]
+	(when (== (.-which e) ENTER_KEY)
+		(let [new-field (om/get-node owner "newField")]
+			(when-not (string/blank? (.. new-field -value trim))
+				(let [new-todo {:id (guid)
+												:title (.-value new-field)
+												:completed false}]
+					(om/transact! state :todos
+						#(conj % new-todo)
+						[:create new-todo]))
+				(set! (.-value new-field) "")))
+		false))
+
+(defn destroy-todo [state {:keys [id]}]
+	(om/transact! state :todos
+		(fn [todos] (into [] (remove #(= (:id %) id) todos)))
+		[:delete id]))
+
+(defn edit-todo [state {:keys [id]}]
+	(om/update! state :editing id))
+
+(defn save-todos [state]
+	(om/update! state :editing nil))
+
+(defn cancel-action [state]
+	(om/update! state :editing nil))
+
+(defn handle-event [type state val]
+	(case type
+		:destroy (destroy-todo state val)
+		:edit    (edit-todo state val)
+		:save    (save-todos state)
+		:cancel  (cancel-action state)
+		nil))
+
+;; -----------------------------------------------------------------------------
+;; Sub-Components
 
 (defn visible? [todo filter]
   (case filter
@@ -48,6 +95,15 @@
 	(dom/header #js {:id "header"}
 		(dom/h1 nil "todos")))
 
+(defn list-items [todos showing editing comm]
+	(om/build-all item/todo-item todos
+		{:init-state {:comm comm}
+		 :key :id
+		 :fn (fn [todo]
+					 (cond-> todo
+						 (= (:id todo) editing) (assoc :editing true)
+						 (not (visible? todo showing)) (assoc :hidden true)))}))
+
 (defn listing [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
     (dom/input
@@ -55,13 +111,7 @@
            :onChange #(toggle-all % state)
            :checked (every? :completed todos)})
     (apply dom/ul #js {:id "todo-list"}
-      (om/build-all item/todo-item todos
-        {:init-state {:comm comm}
-         :key :id
-         :fn (fn [todo]
-               (cond-> todo
-                 (= (:id todo) editing) (assoc :editing true)
-                 (not (visible? todo showing)) (assoc :hidden true)))}))))
+			(list-items todos showing editing comm))))
 
 (defn footer [{:keys [todos] :as state}]
   (let [count (count (remove :completed todos))
@@ -87,48 +137,8 @@
 						 (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
 		(.getElementById js/document "info")))
 
-;; =============================================================================
-;; Todos
-
-(defn toggle-all [e state]
-  (let [checked (.. e -target -checked)]
-    (om/transact! state :todos
-      (fn [todos] (vec (map #(assoc % :completed checked) todos))))))
-
-(defn enter-new-todo [e state owner]
-  (when (== (.-which e) ENTER_KEY)
-    (let [new-field (om/get-node owner "newField")]
-      (when-not (string/blank? (.. new-field -value trim))
-        (let [new-todo {:id (guid)
-                        :title (.-value new-field)
-                        :completed false}]
-          (om/transact! state :todos
-            #(conj % new-todo)
-            [:create new-todo]))
-        (set! (.-value new-field) "")))
-    false))
-
-(defn destroy-todo [state {:keys [id]}]
-  (om/transact! state :todos
-    (fn [todos] (into [] (remove #(= (:id %) id) todos)))
-    [:delete id]))
-
-(defn edit-todo [state {:keys [id]}]
-	(om/update! state :editing id))
-
-(defn save-todos [state]
-	(om/update! state :editing nil))
-
-(defn cancel-action [state]
-	(om/update! state :editing nil))
-
-(defn handle-event [type state val]
-  (case type
-    :destroy (destroy-todo state val)
-    :edit    (edit-todo state val)
-    :save    (save-todos state)
-    :cancel  (cancel-action state)
-    nil))
+;; -----------------------------------------------------------------------------
+;; Todo App
 
 (defn todo-app [{:keys [todos] :as state} owner]
   (reify
@@ -154,6 +164,9 @@
 							 :onKeyDown #(enter-new-todo % state owner)})
 				(listing state comm)
 				(footer state)))))
+
+;; -----------------------------------------------------------------------------
+;; Root
 
 (om/root todo-app app-state
   {:target (.getElementById js/document "todoapp")})
