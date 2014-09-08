@@ -43,7 +43,7 @@
 ;; Event Handlers
 
 (defn toggle-all [e state]
-	(let [checked (.. e -target -checked)]
+	(let [checked (-> e .-target .-checked)]
 		(om/transact! state :todos
 			(fn [todos] (vec (map #(assoc % :completed checked) todos))))))
 

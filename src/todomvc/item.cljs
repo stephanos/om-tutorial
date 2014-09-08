@@ -46,7 +46,7 @@
     nil))
 
 (defn change [e todo owner]
-  (om/set-state! owner :edit-text (.. e -target -value)))
+  (om/set-state! owner :edit-text (-> e .-target .-value)))
 
 ;; -----------------------------------------------------------------------------
 ;; Component
@@ -62,7 +62,7 @@
       (when (and (:editing todo)
                  (om/get-state owner :needs-focus))
         (let [node (om/get-node owner "editField")
-              len  (.. node -value -length)]
+              len  (-> node .-value .-length)]
           (.focus node)
           (.setSelectionRange node len len))
         (om/set-state! owner :needs-focus nil)))
