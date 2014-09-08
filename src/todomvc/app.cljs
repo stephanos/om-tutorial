@@ -1,7 +1,7 @@
 (ns todomvc.app
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [goog.events :as events]
-            [cljs.core.async :refer [put! <! chan]]
+            [cljs.core.async :refer [<! chan]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
 						[secretary.core :as secretary :include-macros true :refer [defroute]]

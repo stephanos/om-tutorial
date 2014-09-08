@@ -1,5 +1,5 @@
 (ns todomvc.item
-  (:require [cljs.core.async :refer [>! put!]]
+  (:require [cljs.core.async :refer [put!]]
             [todomvc.utils :refer [now hidden]]
             [clojure.string :as string]
             [om.core :as om :include-macros true]
