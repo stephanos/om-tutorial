@@ -63,7 +63,7 @@
 
 (defn destroy-todo [state {:keys [id]}]
 	(om/transact! state :todos
-		(fn [todos] (into [] (remove #(= (:id %) id) todos)))
+		(fn [todos] (vec (remove #(= (:id %) id) todos)))
 		[:delete id]))
 
 (defn edit-todo [state {:keys [id]}]
