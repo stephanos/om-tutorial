@@ -55,16 +55,13 @@
 				(let [new-todo {:id (guid)
 												:title new-field-text
 												:completed false}]
-					(om/transact! state :todos
-						#(conj % new-todo)
-						[:create new-todo]))
+					(om/transact! state :todos #(conj % new-todo)))
 				(set! (.-value new-field) "")))
 		false))
 
 (defn destroy-todo [state {:keys [id]}]
 	(om/transact! state :todos
-		(fn [todos] (vec (remove #(= (:id %) id) todos)))
-		[:delete id]))
+		(fn [todos] (vec (remove #(= (:id %) id) todos)))))
 
 (defn edit-todo [state {:keys [id]}]
 	(om/update! state :editing id))
