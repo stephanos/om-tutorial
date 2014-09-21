@@ -124,9 +124,9 @@
 					[:strong count]
 					(str " " (pluralize count "item") " left")]
 				[:ul {:id "filters"}
-					[:li [:a {:href "#/" :class-name (sel :all)} "All"]]
-					[:li [:a {:href "#/active" :class-name (sel :active)} "Active"]]
-					[:li [:a {:href "#/completed" :class-name (sel :completed)} "Completed"]]]])))
+					[:li [:a {:href "#/" :class (sel :all)} "All"]]
+					[:li [:a {:href "#/active" :class (sel :active)} "Active"]]
+					[:li [:a {:href "#/completed" :class (sel :completed)} "Completed"]]]])))
 
 (defn render-disclaimer []
 	(dom/render

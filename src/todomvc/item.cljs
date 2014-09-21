@@ -73,21 +73,21 @@
                     (:completed todo) (str "completed")
                     (:editing todo)   (str "editing"))]
 				(html
-       		[:li {:class-name class :style (hidden (:hidden todo))}
+       		[:li {:class class :style (hidden (:hidden todo))}
 						[:div
-							{:class-name "view"}]
+							{:class "view"}]
 						[:input
-							{:class-name "toggle" :type "checkbox"
+							{:class "toggle" :type "checkbox"
 							 :checked (and (:completed todo) "checked")
 							 :on-change #(complete todo)}]
 						[:label
 							{:on-double-click #(edit % todo owner comm)}
 							(:title todo)]
 						[:button
-							{:class-name "destroy"
+							{:class "destroy"
 							 :on-click #(destroy todo comm)}]
 						[:input
-							{:ref "editField" :class-name "edit"
+							{:ref "editField" :class "edit"
 							 :value (om/get-state owner :edit-text)
 							 :on-blur #(submit % todo owner comm)
 							 :on-change #(change % todo owner)
