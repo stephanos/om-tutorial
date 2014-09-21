@@ -14,11 +14,26 @@
 
   :source-paths ["src"]
 
-  :cljsbuild { 
+	:aliases {
+		"publish" ["do" ["cljsbuild" "clean"] ["cljsbuild" "once" "release"]]
+	}
+
+  :cljsbuild {
     :builds [{:id "dev"
               :source-paths ["src"]
               :compiler {
                 :output-to "app.js"
                 :output-dir "out"
                 :optimizations :none
-                :source-map true}}]})
+                :source-map true}}
+						 {:id "release"
+							:source-paths ["src"]
+							:compiler {
+								:output-to "app.js"
+								:optimizations :advanced
+								:elide-asserts true
+								:pretty-print false
+								:output-wrapper false
+								:source-map "app.js.map"
+								:externs ["src/react-externs.js"]}}]})
+
