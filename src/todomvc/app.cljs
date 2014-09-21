@@ -141,7 +141,7 @@
 ;; -----------------------------------------------------------------------------
 ;; Todo App
 
-(defcomponent todo-app [state owner]
+(defcomponent todo-app [{:keys [todos] :as state}  owner]
 	(will-mount [_]
 		(let [comm (chan)]
 			(om/set-state! owner :comm comm)
