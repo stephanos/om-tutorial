@@ -2,8 +2,8 @@
   (:require [cljs.core.async :refer [put!]]
             [todomvc.utils :refer [now hidden]]
             [clojure.string :as string]
-            [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]))
+						[sablono.core :as html :refer-macros [html]]
+            [om.core :as om :include-macros true]))
 
 (def ESCAPE_KEY 27)
 (def ENTER_KEY 13)
@@ -72,21 +72,23 @@
       (let [class (cond-> ""
                     (:completed todo) (str "completed")
                     (:editing todo)   (str "editing"))]
-        (dom/li #js {:className class :style (hidden (:hidden todo))}
-          (dom/div #js {:className "view"}
-            (dom/input
-              #js {:className "toggle" :type "checkbox"
-                   :checked (and (:completed todo) "checked")
-                   :onChange #(complete todo)})
-            (dom/label
-              #js {:onDoubleClick #(edit % todo owner comm)}
-              	(:title todo))
-            (dom/button
-              #js {:className "destroy"
-                   :onClick #(destroy todo comm)}))
-          (dom/input
-            #js {:ref "editField" :className "edit"
-                 :value (om/get-state owner :edit-text)
-                 :onBlur #(submit % todo owner comm)
-                 :onChange #(change % todo owner)
-                 :onKeyDown #(key-down % todo owner comm)}))))))
+				(html
+       		[:li {:class-name class :style (hidden (:hidden todo))}
+						[:div
+							{:class-name "view"}]
+						[:input
+							{:class-name "toggle" :type "checkbox"
+							 :checked (and (:completed todo) "checked")
+							 :on-change #(complete todo)}]
+						[:label
+							{:on-double-click #(edit % todo owner comm)}
+							(:title todo)]
+						[:button
+							{:class-name "destroy"
+							 :on-click #(destroy todo comm)}]
+						[:input
+							{:ref "editField" :class-name "edit"
+							 :value (om/get-state owner :edit-text)
+							 :on-blur #(submit % todo owner comm)
+							 :on-change #(change % todo owner)
+							 :on-key-down #(key-down % todo owner comm)}]])))))

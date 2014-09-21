@@ -4,6 +4,7 @@
             [cljs.core.async :refer [<! chan]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+						[sablono.core :as html :refer-macros [html]]
 						[secretary.core :as secretary :include-macros true :refer [defroute]]
             [todomvc.utils :refer [pluralize now guid store hidden]]
             [clojure.string :as string]
@@ -90,8 +91,9 @@
     :completed (:completed todo)))
 
 (defn header []
-	(dom/header #js {:id "header"}
-		(dom/h1 nil "todos")))
+	(html
+		[:header {:id "header"}
+			[:h1 "todos"]]))
 
 (defn list-items [todos showing editing comm]
 	(om/build-all item/todo-item todos
@@ -103,36 +105,36 @@
 						 (not (visible? todo showing)) (assoc :hidden true)))}))
 
 (defn listing [{:keys [todos showing editing] :as state} comm]
-  (dom/section #js {:id "main" :style (hidden (empty? todos))}
-    (dom/input
-      #js {:id "toggle-all" :type "checkbox"
-           :onChange #(toggle-all % state)
-           :checked (every? :completed todos)})
-    (apply dom/ul #js {:id "todo-list"}
-			(list-items todos showing editing comm))))
+  (html
+		[:section {:id "main" :style (hidden (empty? todos))}
+			[:input
+			 	{:id "toggle-all" :type "checkbox"
+				 :on-change #(toggle-all % state)
+				 :checked (every? :completed todos)}]
+			[:ul {:id "todo-list"}
+				(list-items todos showing editing comm)]]))
 
 (defn footer [{:keys [todos] :as state}]
   (let [count (count (remove :completed todos))
 				sel   (-> (zipmap [:all :active :completed] (repeat ""))
                   (assoc (:showing state) "selected"))]
-    (dom/footer #js {:id "footer" :style (hidden (empty? todos))}
-      (dom/span #js {:id "todo-count"}
-        (dom/strong nil count)
-        (str " " (pluralize count "item") " left"))
-      (dom/ul #js {:id "filters"}
-        (dom/li nil (dom/a #js {:href "#/" :className (sel :all)} "All"))
-        (dom/li nil (dom/a #js {:href "#/active" :className (sel :active)} "Active"))
-        (dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
+		(html
+			[:footer {:id "footer" :style (hidden (empty? todos))}
+      	[:span {:id "todo-count"}
+					[:strong count]
+					(str " " (pluralize count "item") " left")]
+				[:ul {:id "filters"}
+					[:li [:a {:href "#/" :class-name (sel :all)} "All"]]
+					[:li [:a {:href "#/active" :class-name (sel :active)} "Active"]]
+					[:li [:a {:href "#/completed" :class-name (sel :completed)} "Completed"]]]])))
 
 (defn render-disclaimer []
 	(dom/render
-		(dom/div nil
-			(dom/p nil "Double-click to edit a todo")
-			(dom/p nil
-				(dom/a #js {:href "http://github.com/swannodette"}))
-			(dom/p nil
-				#js ["Part of"
-						 (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
+		(html
+			[:div
+				[:p "Double-click to edit a todo"]
+				[:p "Part of "
+					[:a {:href "http://todomvc.com"} "TodoMVC"]]])
 		(.getElementById js/document "info")))
 
 ;; -----------------------------------------------------------------------------
@@ -154,14 +156,16 @@
 
 		om/IRenderState
     (render-state [_ {:keys [comm]}]
-			(dom/div nil
-				(header)
-				(dom/input
-					#js {:id "new-todo" :ref "newField"
-							 :placeholder "What needs to be done?"
-							 :onKeyDown #(enter-new-todo % state owner)})
-				(listing state comm)
-				(footer state)))))
+			(html
+				[:div
+				 	(header)
+				 	[:input
+				 		{:id "new-todo"
+						 :ref "newField"
+						 :placeholder "What needs to be done?"
+						 :on-key-down #(enter-new-todo % state owner)}]
+					(listing state comm)
+					(footer state)]))))
 
 ;; -----------------------------------------------------------------------------
 ;; Root
