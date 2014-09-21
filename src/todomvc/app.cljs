@@ -4,6 +4,7 @@
             [cljs.core.async :refer [<! chan]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+						[om-tools.core :refer-macros [defcomponent]]
 						[sablono.core :as html :refer-macros [html]]
 						[secretary.core :as secretary :include-macros true :refer [defroute]]
             [todomvc.utils :refer [pluralize now guid store hidden]]
@@ -140,32 +141,28 @@
 ;; -----------------------------------------------------------------------------
 ;; Todo App
 
-(defn todo-app [{:keys [todos] :as state} owner]
-  (reify
-    om/IWillMount
-    (will-mount [_]
-      (let [comm (chan)]
-        (om/set-state! owner :comm comm)
-        (go (while true
-              (let [[type value] (<! comm)]
-                (handle-event type state value))))))
+(defcomponent todo-app [state owner]
+	(will-mount [_]
+		(let [comm (chan)]
+			(om/set-state! owner :comm comm)
+			(go (while true
+						(let [[type value] (<! comm)]
+							(handle-event type state value))))))
 
-		om/IDidUpdate
-    (did-update [_ _ _]
-      (store "todos" todos))
+	(did-update [_ _ _]
+		(store "todos" todos))
 
-		om/IRenderState
-    (render-state [_ {:keys [comm]}]
-			(html
-				[:div
-				 	(header)
-				 	[:input
-				 		{:id "new-todo"
-						 :ref "newField"
-						 :placeholder "What needs to be done?"
-						 :on-key-down #(enter-new-todo % state owner)}]
-					(listing state comm)
-					(footer state)]))))
+	(render-state [_ {:keys [comm]}]
+		(html
+			[:div
+				(header)
+				[:input
+					{:id "new-todo"
+					 :ref "newField"
+					 :placeholder "What needs to be done?"
+					 :on-key-down #(enter-new-todo % state owner)}]
+				(listing state comm)
+				(footer state)])))
 
 ;; -----------------------------------------------------------------------------
 ;; Root

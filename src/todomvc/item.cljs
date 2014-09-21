@@ -2,6 +2,7 @@
   (:require [cljs.core.async :refer [put!]]
             [todomvc.utils :refer [now hidden]]
             [clojure.string :as string]
+						[om-tools.core :refer-macros [defcomponent]]
 						[sablono.core :as html :refer-macros [html]]
             [om.core :as om :include-macros true]))
 
@@ -51,44 +52,40 @@
 ;; -----------------------------------------------------------------------------
 ;; Component
 
-(defn todo-item [todo owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:edit-text (:title todo)})
+(defcomponent todo-item [todo owner]
+	(init-state [_]
+		{:edit-text (:title todo)})
 
-		om/IDidUpdate
-    (did-update [_ _ _]
-      (when (and (:editing todo)
-                 (om/get-state owner :needs-focus))
-        (let [node (om/get-node owner "editField")
-              len  (-> node .-value .-length)]
-          (.focus node)
-          (.setSelectionRange node len len))
-        (om/set-state! owner :needs-focus nil)))
+	(did-update [_ _ _]
+		(when (and (:editing todo)
+							 (om/get-state owner :needs-focus))
+			(let [node (om/get-node owner "editField")
+						len  (-> node .-value .-length)]
+				(.focus node)
+				(.setSelectionRange node len len))
+			(om/set-state! owner :needs-focus nil)))
 
-		om/IRenderState
-    (render-state [_ {:keys [comm] :as state}]
-      (let [class (cond-> ""
-                    (:completed todo) (str "completed")
-                    (:editing todo)   (str "editing"))]
-				(html
-       		[:li {:class class :style (hidden (:hidden todo))}
-						[:div
-							{:class "view"}]
-						[:input
-							{:class "toggle" :type "checkbox"
-							 :checked (and (:completed todo) "checked")
-							 :on-change #(complete todo)}]
-						[:label
-							{:on-double-click #(edit % todo owner comm)}
-							(:title todo)]
-						[:button
-							{:class "destroy"
-							 :on-click #(destroy todo comm)}]
-						[:input
-							{:ref "editField" :class "edit"
-							 :value (om/get-state owner :edit-text)
-							 :on-blur #(submit % todo owner comm)
-							 :on-change #(change % todo owner)
-							 :on-key-down #(key-down % todo owner comm)}]])))))
+	(render-state [_ {:keys [comm] :as state}]
+		(let [class (cond-> ""
+									(:completed todo) (str "completed")
+									(:editing todo)   (str "editing"))]
+			(html
+				[:li {:class class :style (hidden (:hidden todo))}
+					[:div
+						{:class "view"}]
+					[:input
+						{:class "toggle" :type "checkbox"
+						 :checked (and (:completed todo) "checked")
+						 :on-change #(complete todo)}]
+					[:label
+						{:on-double-click #(edit % todo owner comm)}
+						(:title todo)]
+					[:button
+						{:class "destroy"
+						 :on-click #(destroy todo comm)}]
+					[:input
+						{:ref "editField" :class "edit"
+						 :value (om/get-state owner :edit-text)
+						 :on-blur #(submit % todo owner comm)
+						 :on-change #(change % todo owner)
+							 :on-key-down #(key-down % todo owner comm)}]]))))
