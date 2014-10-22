@@ -17,6 +17,7 @@
   :source-paths ["src"]
 
 	:aliases {
+	 	"develop" ["do" ["cljsbuild" "clean"] ["cljsbuild" "auto" "dev"]]
 		"publish" ["do" ["cljsbuild" "clean"] ["cljsbuild" "once" "release"]]
 	}
 
