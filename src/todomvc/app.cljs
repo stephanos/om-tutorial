@@ -3,11 +3,12 @@
   (:require [goog.events :as events]
             [cljs.core.async :refer [<! chan]]
             [om.core :as om :include-macros true]
+						[schema.core :as s :include-macros true]
             [om.dom :as dom :include-macros true]
 						[om-tools.core :refer-macros [defcomponent]]
 						[sablono.core :as html :refer-macros [html]]
 						[secretary.core :as secretary :include-macros true :refer [defroute]]
-            [todomvc.utils :refer [pluralize now guid store hidden]]
+            [todomvc.utils :refer [Todo pluralize now guid store hidden]]
             [clojure.string :as string]
             [todomvc.item :as item])
   (:import [goog History]
@@ -167,7 +168,8 @@
 ;; -----------------------------------------------------------------------------
 ;; Root
 
-(om/root todo-app app-state
-  {:target (.getElementById js/document "todoapp")})
+(s/with-fn-validation
+	(om/root todo-app app-state
+	  {:target (.getElementById js/document "todoapp")}))
 
 (render-disclaimer)

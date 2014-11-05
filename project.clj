@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "0.0-2280"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
 								 [prismatic/om-tools "0.3.6"]
+								 [prismatic/schema "0.3.2"]
 								 [secretary "1.2.0"]
 								 [sablono "0.2.22"]
                  [om "0.7.1"]]

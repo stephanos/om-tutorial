@@ -1,6 +1,13 @@
 (ns todomvc.utils
-  (:require [cljs.reader :as reader])
+  (:require
+		[cljs.reader :as reader]
+		[schema.core :as s :include-macros true])
   (:import [goog.ui IdGenerator]))
+
+(def Todo
+	{:id s/Str
+	 :title s/Str
+	 :completed s/Bool})
 
 (defn guid []
   (.getNextUniqueId (.getInstance IdGenerator)))

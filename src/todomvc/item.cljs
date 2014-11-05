@@ -1,7 +1,8 @@
 (ns todomvc.item
   (:require [cljs.core.async :refer [put!]]
-            [todomvc.utils :refer [now hidden]]
+            [todomvc.utils :refer [Todo now hidden]]
             [clojure.string :as string]
+						[schema.core :as s :include-macros true]
 						[om-tools.core :refer-macros [defcomponent]]
 						[sablono.core :as html :refer-macros [html]]
             [om.core :as om :include-macros true]))
@@ -52,8 +53,9 @@
 ;; -----------------------------------------------------------------------------
 ;; Component
 
-(defcomponent todo-item [todo owner]
+(defcomponent todo-item [todo :- Todo owner]
 	(init-state [_]
+		(s/validate Todo todo)
 		{:edit-text (:title todo)})
 
 	(did-update [_ _ _]
