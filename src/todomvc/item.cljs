@@ -24,10 +24,10 @@
   false)
 
 (defn complete [todo]
-	(om/transact! todo :completed #(not %)))
+  (om/transact! todo :completed #(not %)))
 
 (defn destroy [todo comm]
-	(put! comm [:destroy @todo]))
+  (put! comm [:destroy @todo]))
 
 (defn edit [e todo owner comm]
   (let [todo @todo
@@ -42,7 +42,7 @@
     ESCAPE_KEY (let [todo @todo]
                  (om/set-state! owner :edit-text (:title todo))
                  (put! comm [:cancel todo]))
-    ENTER_KEY  (submit e todo owner comm)
+    ENTER_KEY (submit e todo owner comm)
     nil))
 
 (defn change [e todo owner]
@@ -57,21 +57,21 @@
     (init-state [_]
       {:edit-text (:title todo)})
 
-		om/IDidUpdate
+    om/IDidUpdate
     (did-update [_ _ _]
       (when (and (:editing todo)
-                 (om/get-state owner :needs-focus))
+              (om/get-state owner :needs-focus))
         (let [node (om/get-node owner "editField")
-              len  (-> node .-value .-length)]
+              len (-> node .-value .-length)]
           (.focus node)
           (.setSelectionRange node len len))
         (om/set-state! owner :needs-focus nil)))
 
-		om/IRenderState
+    om/IRenderState
     (render-state [_ {:keys [comm] :as state}]
       (let [class (cond-> ""
                     (:completed todo) (str "completed")
-                    (:editing todo)   (str "editing"))]
+                    (:editing todo) (str "editing"))]
         (dom/li #js {:className class :style (hidden (:hidden todo))}
           (dom/div #js {:className "view"}
             (dom/input
@@ -80,7 +80,7 @@
                    :onChange #(complete todo)})
             (dom/label
               #js {:onDoubleClick #(edit % todo owner comm)}
-              	(:title todo))
+              (:title todo))
             (dom/button
               #js {:className "destroy"
                    :onClick #(destroy todo comm)}))

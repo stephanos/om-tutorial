@@ -4,7 +4,7 @@
             [cljs.core.async :refer [<! chan]]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-						[secretary.core :as secretary :include-macros true :refer [defroute]]
+            [secretary.core :as secretary :include-macros true :refer [defroute]]
             [todomvc.utils :refer [pluralize now guid store hidden]]
             [clojure.string :as string]
             [todomvc.item :as item])
@@ -24,10 +24,10 @@
 ;; Routing
 
 (defroute "/" []
-	(swap! app-state assoc :showing :all))
+  (swap! app-state assoc :showing :all))
 
 (defroute "/:filter" [filter]
-	(swap! app-state assoc :showing (keyword filter)))
+  (swap! app-state assoc :showing (keyword filter)))
 
 (def history (History.))
 
@@ -43,42 +43,40 @@
 ;; Event Handlers
 
 (defn toggle-all [e state]
-	(let [checked (-> e .-target .-checked)]
-		(om/transact! state :todos
-			(fn [todos] (vec (map #(assoc % :completed checked) todos))))))
+  (let [checked (-> e .-target .-checked)]
+    (om/transact! state :todos (fn [todos] (vec (map #(assoc % :completed checked) todos))))))
 
 (defn enter-new-todo [e state owner]
-	(when (== (.-which e) ENTER_KEY)
-		(let [new-field 		 (om/get-node owner "newField")
-					new-field-text (string/trim (.-value new-field))]
-			(when-not (string/blank? new-field-text)
-				(let [new-todo {:id (guid)
-												:title new-field-text
-												:completed false}]
-					(om/transact! state :todos #(conj % new-todo)))
-				(set! (.-value new-field) "")))
-		false))
+  (when (== (.-which e) ENTER_KEY)
+    (let [new-field (om/get-node owner "newField")
+          new-field-text (string/trim (.-value new-field))]
+      (when-not (string/blank? new-field-text)
+        (let [new-todo {:id (guid)
+                        :title new-field-text
+                        :completed false}]
+          (om/transact! state :todos #(conj % new-todo)))
+        (set! (.-value new-field) "")))
+    false))
 
 (defn destroy-todo [state {:keys [id]}]
-	(om/transact! state :todos
-		(fn [todos] (vec (remove #(= (:id %) id) todos)))))
+  (om/transact! state :todos (fn [todos] (vec (remove #(= (:id %) id) todos)))))
 
 (defn edit-todo [state {:keys [id]}]
-	(om/update! state :editing id))
+  (om/update! state :editing id))
 
 (defn save-todos [state]
-	(om/update! state :editing nil))
+  (om/update! state :editing nil))
 
 (defn cancel-action [state]
-	(om/update! state :editing nil))
+  (om/update! state :editing nil))
 
 (defn handle-event [type state val]
-	(case type
-		:destroy (destroy-todo state val)
-		:edit    (edit-todo state val)
-		:save    (save-todos state)
-		:cancel  (cancel-action state)
-		nil))
+  (case type
+    :destroy (destroy-todo state val)
+    :edit (edit-todo state val)
+    :save (save-todos state)
+    :cancel (cancel-action state)
+    nil))
 
 ;; -----------------------------------------------------------------------------
 ;; Sub-Components
@@ -90,17 +88,17 @@
     :completed (:completed todo)))
 
 (defn header []
-	(dom/header #js {:id "header"}
-		(dom/h1 nil "todos")))
+  (dom/header #js {:id "header"}
+    (dom/h1 nil "todos")))
 
 (defn list-items [todos showing editing comm]
-	(om/build-all item/todo-item todos
-		{:init-state {:comm comm}
-		 :key :id
-		 :fn (fn [todo]
-					 (cond-> todo
-						 (= (:id todo) editing) (assoc :editing true)
-						 (not (visible? todo showing)) (assoc :hidden true)))}))
+  (om/build-all item/todo-item todos
+    {:init-state {:comm comm}
+     :key :id
+     :fn (fn [todo]
+           (cond-> todo
+             (= (:id todo) editing) (assoc :editing true)
+             (not (visible? todo showing)) (assoc :hidden true)))}))
 
 (defn listing [{:keys [todos showing editing] :as state} comm]
   (dom/section #js {:id "main" :style (hidden (empty? todos))}
@@ -109,12 +107,12 @@
            :onChange #(toggle-all % state)
            :checked (every? :completed todos)})
     (apply dom/ul #js {:id "todo-list"}
-			(list-items todos showing editing comm))))
+      (list-items todos showing editing comm))))
 
 (defn footer [{:keys [todos] :as state}]
   (let [count (count (remove :completed todos))
-				sel   (-> (zipmap [:all :active :completed] (repeat ""))
-                  (assoc (:showing state) "selected"))]
+        sel (-> (zipmap [:all :active :completed] (repeat ""))
+              (assoc (:showing state) "selected"))]
     (dom/footer #js {:id "footer" :style (hidden (empty? todos))}
       (dom/span #js {:id "todo-count"}
         (dom/strong nil count)
@@ -125,15 +123,15 @@
         (dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
 
 (defn render-disclaimer []
-	(dom/render
-		(dom/div nil
-			(dom/p nil "Double-click to edit a todo")
-			(dom/p nil
-				(dom/a #js {:href "http://github.com/swannodette"}))
-			(dom/p nil
-				#js ["Part of"
-						 (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
-		(.getElementById js/document "info")))
+  (dom/render
+    (dom/div nil
+      (dom/p nil "Double-click to edit a todo")
+      (dom/p nil
+        (dom/a #js {:href "http://github.com/swannodette"}))
+      (dom/p nil
+        #js ["Part of"
+             (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
+    (.getElementById js/document "info")))
 
 ;; -----------------------------------------------------------------------------
 ;; Todo App
@@ -148,20 +146,20 @@
               (let [[type value] (<! comm)]
                 (handle-event type state value))))))
 
-		om/IDidUpdate
+    om/IDidUpdate
     (did-update [_ _ _]
       (store "todos" todos))
 
-		om/IRenderState
+    om/IRenderState
     (render-state [_ {:keys [comm]}]
-			(dom/div nil
-				(header)
-				(dom/input
-					#js {:id "new-todo" :ref "newField"
-							 :placeholder "What needs to be done?"
-							 :onKeyDown #(enter-new-todo % state owner)})
-				(listing state comm)
-				(footer state)))))
+      (dom/div nil
+        (header)
+        (dom/input
+          #js {:id "new-todo" :ref "newField"
+               :placeholder "What needs to be done?"
+               :onKeyDown #(enter-new-todo % state owner)})
+        (listing state comm)
+        (footer state)))))
 
 ;; -----------------------------------------------------------------------------
 ;; Root
