@@ -1,15 +1,15 @@
 (ns todomvc.app
 	(:require-macros [cljs.core.async.macros :refer [go]])
 	(:require [goog.events :as events]
-	 [cljs.core.async :refer [<! chan]]
-	 [om.core :as om :include-macros true]
-	 [om.dom :as dom :include-macros true]
-	 [secretary.core :as secretary :include-macros true :refer [defroute]]
-	 [todomvc.utils :refer [pluralize now guid store hidden]]
-	 [clojure.string :as string]
-	 [todomvc.item :as item])
+						[cljs.core.async :refer [<! chan]]
+						[om.core :as om :include-macros true]
+						[om.dom :as dom :include-macros true]
+						[secretary.core :as secretary :include-macros true :refer [defroute]]
+						[todomvc.utils :refer [pluralize now guid store hidden]]
+						[clojure.string :as string]
+						[todomvc.item :as item])
 	(:import [goog History]
-	 [goog.history EventType]))
+					 [goog.history EventType]))
 
 (enable-console-print!)
 
@@ -24,15 +24,15 @@
 ;; Routing
 
 (defroute "/" []
-							(swap! app-state assoc :showing :all))
+	(swap! app-state assoc :showing :all))
 
 (defroute "/:filter" [filter]
-										 (swap! app-state assoc :showing (keyword filter)))
+	(swap! app-state assoc :showing (keyword filter)))
 
 (def history (History.))
 
 (events/listen history EventType.NAVIGATE
-											 (fn [e] (secretary/dispatch! (.-token e))))
+	(fn [e] (secretary/dispatch! (.-token e))))
 
 (.setEnabled history true)
 
@@ -89,38 +89,38 @@
 
 (defn header []
 	(dom/header #js {:id "header"}
-									(dom/h1 nil "todos")))
+		(dom/h1 nil "todos")))
 
 (defn list-items [todos showing editing comm]
 	(om/build-all item/todo-item todos
-															 {:init-state {:comm comm}
-																:key :id
-																:fn (fn [todo]
-																			(cond-> todo
-																				(= (:id todo) editing) (assoc :editing true)
-																				(not (visible? todo showing)) (assoc :hidden true)))}))
+		{:init-state {:comm comm}
+		 :key :id
+		 :fn (fn [todo]
+					 (cond-> todo
+						 (= (:id todo) editing) (assoc :editing true)
+						 (not (visible? todo showing)) (assoc :hidden true)))}))
 
 (defn listing [{:keys [todos showing editing] :as state} comm]
 	(dom/section #js {:id "main" :style (hidden (empty? todos))}
-									 (dom/input
-										 #js {:id "toggle-all" :type "checkbox"
-													:onChange #(toggle-all % state)
-													:checked (every? :completed todos)})
-									 (apply dom/ul #js {:id "todo-list"}
-																 (list-items todos showing editing comm))))
+		(dom/input
+			#js {:id "toggle-all" :type "checkbox"
+					 :onChange #(toggle-all % state)
+					 :checked (every? :completed todos)})
+		(apply dom/ul #js {:id "todo-list"}
+			(list-items todos showing editing comm))))
 
 (defn footer [{:keys [todos] :as state}]
 	(let [count (count (remove :completed todos))
 				sel (-> (zipmap [:all :active :completed] (repeat ""))
 							(assoc (:showing state) "selected"))]
 		(dom/footer #js {:id "footer" :style (hidden (empty? todos))}
-										(dom/span #js {:id "todo-count"}
-																	(dom/strong nil count)
-																	(str " " (pluralize count "item") " left"))
-										(dom/ul #js {:id "filters"}
-																(dom/li nil (dom/a #js {:href "#/" :className (sel :all)} "All"))
-																(dom/li nil (dom/a #js {:href "#/active" :className (sel :active)} "Active"))
-																(dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
+			(dom/span #js {:id "todo-count"}
+				(dom/strong nil count)
+				(str " " (pluralize count "item") " left"))
+			(dom/ul #js {:id "filters"}
+				(dom/li nil (dom/a #js {:href "#/" :className (sel :all)} "All"))
+				(dom/li nil (dom/a #js {:href "#/active" :className (sel :active)} "Active"))
+				(dom/li nil (dom/a #js {:href "#/completed" :className (sel :completed)} "Completed"))))))
 
 (defn render-disclaimer []
 	(dom/render
@@ -165,6 +165,6 @@
 ;; Root
 
 (om/root todo-app app-state
-									{:target (.getElementById js/document "todoapp")})
+	{:target (.getElementById js/document "todoapp")})
 
 (render-disclaimer)
