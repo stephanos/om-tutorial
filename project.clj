@@ -5,11 +5,13 @@
   :jvm-opts ^:replace ["-Xms4g" "-Xmx4g" "-server"]
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2280"]
-                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
+                 [org.clojure/clojurescript "0.0-2371"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+								 [com.vitalreactor/derive "0.2.0-SNAPSHOT"]
 								 [prismatic/om-tools "0.3.6"]
 								 [prismatic/schema "0.3.2"]
-								 [secretary "1.2.0"]
+								 [datascript "0.5.2"]
+								 [secretary "1.2.1"]
 								 [sablono "0.2.22"]
                  [om "0.7.1"]]
 

@@ -7,8 +7,10 @@
             [om.dom :as dom :include-macros true]
 						[om-tools.core :refer-macros [defcomponent]]
 						[sablono.core :as html :refer-macros [html]]
-						[secretary.core :as secretary :include-macros true :refer [defroute]]
+						[secretary.core :as secretary :refer-macros [defroute]]
             [todomvc.utils :refer [Todo pluralize now guid store hidden]]
+						[datascript :as ds]
+						[derive.core :as d :include-macros true]
             [clojure.string :as string]
             [todomvc.item :as item])
   (:import [goog History]
@@ -22,6 +24,29 @@
 ;; State
 
 (def app-state (atom {:showing :all :todos []}))
+
+(defn bind
+	([conn q]
+		(bind conn q (atom nil)))
+	([conn q state]
+		(let [k (guid)]
+			(reset! state (ds/q q @conn))
+			(ds/listen! conn k (fn [tx-report]
+													(let [novelty (ds/q q (:tx-data tx-report))]
+														(when (not-empty novelty) ;; Only update if query results actually changed
+															(reset! state (ds/q q (:db-after tx-report)))))))
+			(set! (.-__key state) k)
+			state)))
+
+(defn unbind
+	[conn state]
+	(ds/unlisten! conn (.-__key state)))
+
+(def conn (ds/create-conn))
+
+(ds/listen! conn (fn [tx-report] (println tx-report)))
+
+(ds/transact! conn [{:id (guid) :title "Example" :completed false}])
 
 ;; =============================================================================
 ;; Routing
@@ -47,7 +72,7 @@
 
 (defn toggle-all [e state]
 	(let [checked (-> e .-target .-checked)]
-		(om/transact! state :todos
+		(om/transact! state :todos ; TODO: datascript
 			(fn [todos] (vec (map #(assoc % :completed checked) todos))))))
 
 (defn enter-new-todo [e state owner]
@@ -58,22 +83,23 @@
 				(let [new-todo {:id (guid)
 												:title new-field-text
 												:completed false}]
-					(om/transact! state :todos #(conj % new-todo)))
+					(om/transact! state :todos #(conj % new-todo)) ; TODO: remove
+					(ds/transact! conn [new-todo]))
 				(set! (.-value new-field) "")))
 		false))
 
 (defn destroy-todo [state {:keys [id]}]
-	(om/transact! state :todos
+	(om/transact! state :todos ; TODO: datascript
 		(fn [todos] (vec (remove #(= (:id %) id) todos)))))
 
 (defn edit-todo [state {:keys [id]}]
-	(om/update! state :editing id))
+	(om/update! state :editing id)) ; TODO: datascript
 
 (defn save-todos [state]
-	(om/update! state :editing nil))
+	(om/update! state :editing nil)) ; TODO: datascript
 
 (defn cancel-action [state]
-	(om/update! state :editing nil))
+	(om/update! state :editing nil)) ; TODO: datascript
 
 (defn handle-event [type state val]
 	(case type

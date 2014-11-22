@@ -20,12 +20,12 @@
   (when-let [edit-text (om/get-state owner :edit-text)]
     (if-not (string/blank? (.trim edit-text))
       (do
-        (om/update! todo :title edit-text)
+        (om/update! todo :title edit-text) ; TODO: datascript
         (put! comm [:save @todo]))
       (put! comm [:destroy @todo])))
   false)
 
-(defn complete [todo]
+(defn complete [todo] ; TODO: datascript
 	(om/transact! todo :completed #(not %)))
 
 (defn destroy [todo comm]
