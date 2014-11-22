@@ -16,12 +16,12 @@
 (defn store
 	([ns] (store ns nil))
 	([ns edn]
-		(if-not (nil? edn)
-			(.setItem js/localStorage ns (str edn))
-			(let [s (.getItem js/localStorage ns)]
-				(if-not (nil? s)
-					(reader/read-string s)
-					[])))))
+	 (if-not (nil? edn)
+		 (.setItem js/localStorage ns (str edn))
+		 (let [s (.getItem js/localStorage ns)]
+			 (if-not (nil? s)
+				 (reader/read-string s)
+				 [])))))
 
 (defn hidden [is-hidden]
 	(if is-hidden

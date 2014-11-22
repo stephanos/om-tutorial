@@ -1,9 +1,9 @@
 (ns todomvc.item
 	(:require [cljs.core.async :refer [put!]]
-						[todomvc.utils :refer [now hidden]]
-						[clojure.string :as string]
-						[om.core :as om :include-macros true]
-						[om.dom :as dom :include-macros true]))
+	 [todomvc.utils :refer [now hidden]]
+	 [clojure.string :as string]
+	 [om.core :as om :include-macros true]
+	 [om.dom :as dom :include-macros true]))
 
 (def ESCAPE_KEY 27)
 (def ENTER_KEY 13)
@@ -39,11 +39,11 @@
 
 (defn key-down [e todo owner comm]
 	(condp == (.-keyCode e)
-		ESCAPE_KEY (let [todo @todo]
-								 (om/set-state! owner :edit-text (:title todo))
-								 (put! comm [:cancel todo]))
-		ENTER_KEY (submit e todo owner comm)
-		nil))
+						ESCAPE_KEY (let [todo @todo]
+												 (om/set-state! owner :edit-text (:title todo))
+												 (put! comm [:cancel todo]))
+						ENTER_KEY (submit e todo owner comm)
+						nil))
 
 (defn change [e todo owner]
 	(om/set-state! owner :edit-text (-> e .-target .-value)))
@@ -73,20 +73,20 @@
 										(:completed todo) (str "completed")
 										(:editing todo) (str "editing"))]
 				(dom/li #js {:className class :style (hidden (:hidden todo))}
-					(dom/div #js {:className "view"}
-						(dom/input
-							#js {:className "toggle" :type "checkbox"
-									 :checked (and (:completed todo) "checked")
-									 :onChange #(complete todo)})
-						(dom/label
-							#js {:onDoubleClick #(edit % todo owner comm)}
-							(:title todo))
-						(dom/button
-							#js {:className "destroy"
-									 :onClick #(destroy todo comm)}))
-					(dom/input
-						#js {:ref "editField" :className "edit"
-								 :value (om/get-state owner :edit-text)
-								 :onBlur #(submit % todo owner comm)
-								 :onChange #(change % todo owner)
-								 :onKeyDown #(key-down % todo owner comm)}))))))
+										(dom/div #js {:className "view"}
+																 (dom/input
+																	 #js {:className "toggle" :type "checkbox"
+																				:checked (and (:completed todo) "checked")
+																				:onChange #(complete todo)})
+																 (dom/label
+																	 #js {:onDoubleClick #(edit % todo owner comm)}
+																			 (:title todo))
+																 (dom/button
+																	 #js {:className "destroy"
+																				:onClick #(destroy todo comm)}))
+										(dom/input
+											#js {:ref "editField" :className "edit"
+													 :value (om/get-state owner :edit-text)
+													 :onBlur #(submit % todo owner comm)
+													 :onChange #(change % todo owner)
+													 :onKeyDown #(key-down % todo owner comm)}))))))
