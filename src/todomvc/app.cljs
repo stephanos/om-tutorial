@@ -53,30 +53,34 @@
   (d/transact! conn
     [[:db/add 1 :count (inc count)]]))
 
+; run a query
+(defn query [q]
+  (bind conn q)) ; TODO: how to transform to ICursor?
+
 
 ;; =============================================================================
 ;; View
 
-(defn app-counter [count]
+(defn app-counter [state]
   (reify
     om/IRender
     (render [_]
-      (print count)
-      (dom/div nil
-        (dom/span nil count)
-        (dom/button
-          #js {:style #js {:marginLeft "5px"}
-               :onClick #(increment % count)}
-          "+")))))
+      (let [count (ffirst @state)]
+        (print count)
+        (dom/div nil
+          (dom/span nil count)
+          (dom/button
+            #js {:style #js {:marginLeft "5px"}
+                 :onClick #(increment % count)} "+"))))))
 
 (defn app-view []
   (reify
     om/IRender
     (render [_]
-      (let [count (bind conn q-count)]
+      (let [count (query q-count)]
         (dom/div nil
           (dom/h2 nil "Hello World")
-          (om/build #(app-counter (ffirst @count)) {}))))))
+          (om/build #(app-counter count) {}))))))
 
 
 ;; =============================================================================
