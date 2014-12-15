@@ -13,7 +13,7 @@
 								 [datascript "0.5.2"]
 								 [secretary "1.2.1"]
 								 [sablono "0.2.22"]
-                 [om "0.7.1"]]
+                 [om "0.8.0-beta3"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]
 
