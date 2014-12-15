@@ -1,3 +1,3 @@
-# Om Tutorial
+# Om + DataScript
 
-This is the source code for my [Om tutorial](https://blog.stephanbehnke.com/zero-to-om/).
+Experiment to integrate Om with DataScript.
