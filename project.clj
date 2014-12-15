@@ -28,14 +28,14 @@
     :builds [{:id "dev"
               :source-paths ["src"]
               :compiler {
-                :output-to "app.js"
+                :output-to "out/app.js"
                 :output-dir "out"
                 :optimizations :none
                 :source-map true}}
 						 {:id "release"
 							:source-paths ["src"]
 							:compiler {
-								:output-to "app.js"
+								:output-to "out/app.js"
 								:optimizations :advanced
 								:elide-asserts true
 								:pretty-print false
