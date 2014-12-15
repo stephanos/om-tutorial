@@ -6,7 +6,7 @@
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371"]
-								 [datascript "0.5.2"]
+								 [datascript "0.7.0"]
                  [om "0.8.0-beta3"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]
