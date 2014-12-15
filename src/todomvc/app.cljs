@@ -9,8 +9,9 @@
 (defn guid []
   (.getNextUniqueId (.getInstance IdGenerator)))
 
+
 ;; =============================================================================
-;; State
+;; State + View integration
 
 ; from https://gist.github.com/allgress/11348685
 (defn bind
@@ -30,12 +31,19 @@
   [conn state]
   (d/unlisten! conn (.-__key state)))
 
+; run a query
+(defn query [q]
+  (bind conn q)) ; TODO: how to transform to ICursor?
+
+
+;; =============================================================================
+;; State
 
 ; create database
 (def schema {})
 (def conn (d/create-conn schema))
 
-; listen to database changes
+; print database changes
 (d/listen! conn (fn [tx-report] (println tx-report)))
 
 ; init database
@@ -43,7 +51,7 @@
   [{:db/id -1
     :count 0}])
 
-; query to get current count
+; query to get count
 (def q-count
   '[:find ?count
     :where [?e :count ?count]])
@@ -52,10 +60,6 @@
 (defn increment [_ count]
   (d/transact! conn
     [[:db/add 1 :count (inc count)]]))
-
-; run a query
-(defn query [q]
-  (bind conn q)) ; TODO: how to transform to ICursor?
 
 
 ;; =============================================================================
