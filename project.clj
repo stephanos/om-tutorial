@@ -14,22 +14,22 @@
   :source-paths ["src"]
 
 	:aliases {
-	 	"develop" ["do" ["cljsbuild" "clean"] ["cljsbuild" "auto" "dev"]]
-		"publish" ["do" ["cljsbuild" "clean"] ["cljsbuild" "once" "release"]]
+	 	"develop" ["do" ["clean"] ["cljsbuild" "auto" "dev"]]
+		"publish" ["do" ["clean"] ["cljsbuild" "once" "release"]]
 	}
 
   :cljsbuild {
     :builds [{:id "dev"
               :source-paths ["src"]
               :compiler {
-                :output-to "out/app.js"
-                :output-dir "out"
+                :output-to "target/app.js"
+                :output-dir "target"
                 :optimizations :none
                 :source-map true}}
 						 {:id "release"
 							:source-paths ["src"]
 							:compiler {
-								:output-to "out/app.js"
+								:output-to "target/app.js"
 								:optimizations :advanced
 								:elide-asserts true
 								:pretty-print false
