@@ -11,6 +11,31 @@
 
 
 ;; =============================================================================
+;; State
+
+; create database
+(def schema {})
+(def conn (d/create-conn schema))
+
+; print database changes
+(d/listen! conn (fn [tx-report] (println tx-report)))
+
+; init database
+(d/transact! conn
+  [{:db/id -1 :count 42}])
+
+; query to get count
+(def q-count
+  '[:find ?count
+    :where [?e :count ?count]])
+
+; update count
+(defn increment [_ count]
+  (d/transact! conn
+    [[:db/add 1 :count (inc count)]]))
+
+
+;; =============================================================================
 ;; State + View integration
 
 ; from https://gist.github.com/allgress/11348685
@@ -31,36 +56,33 @@
   [conn state]
   (d/unlisten! conn (.-__key state)))
 
+(deftype QueryCursor [conn q state]
+  IDeref
+  (-deref [_]
+    state)
+  om/ICursor
+  (-path [_] [])
+  (-state [_] state)
+  om/ITransact
+  (-transact! [_ _ _ _]
+    (throw (js/Error. "not supported")))
+  IEquiv
+  (-equiv [_ other]
+    (if (om/cursor? other)
+      (= state (-value other))
+      (= state other)))
+  ISeqable
+  (-seq [this]
+    (when (pos? (count @state))
+      (map (fn [v _] (om/-derive this v state [])) @state (range))))
+  IPrintWithWriter
+  (-pr-writer [_ writer opts]
+    (-pr-writer q writer opts)))
+
 ; run a query
 (defn query [q]
-  (bind conn q)) ; TODO: how to transform to ICursor?
-
-
-;; =============================================================================
-;; State
-
-; create database
-(def schema {})
-(def conn (d/create-conn schema))
-
-; print database changes
-(d/listen! conn (fn [tx-report] (println tx-report)))
-
-; init database
-(d/transact! conn
-  [{:db/id -1
-    :count 0}])
-
-; query to get count
-(def q-count
-  '[:find ?count
-    :where [?e :count ?count]])
-
-; update count
-(defn increment [_ count]
-  (d/transact! conn
-    [[:db/add 1 :count (inc count)]]))
-
+  (QueryCursor. conn q (bind conn q)))
+  
 
 ;; =============================================================================
 ;; View
@@ -69,7 +91,8 @@
   (reify
     om/IRender
     (render [_]
-      (let [count (ffirst @state)]
+      (print state)
+      (let [count (ffirst state)]
         (print count)
         (dom/div nil
           (dom/span nil count)
