@@ -17,27 +17,25 @@
 
   :source-paths ["src"]
 
-	:aliases {
-	 	"develop" ["do" ["cljsbuild" "clean"] ["cljsbuild" "auto" "dev"]]
-		"publish" ["do" ["cljsbuild" "clean"] ["cljsbuild" "once" "release"]]
-	}
+  :aliases {
+    "develop" ["do" ["clean"] ["cljsbuild" "auto" "dev"]]
+    "publish" ["do" ["clean"] ["cljsbuild" "once" "release"]]}
 
   :cljsbuild {
-    :builds [{:id "dev"
-              :source-paths ["src"]
-              :compiler {
-                :output-to "app.js"
-                :output-dir "out"
-                :optimizations :none
-                :source-map true}}
-						 {:id "release"
-							:source-paths ["src"]
-							:compiler {
-								:output-to "app.js"
-								:optimizations :advanced
-								:elide-asserts true
-								:pretty-print false
-								:output-wrapper false
-								:source-map "app.js.map"
-								:externs ["src/react-externs.js"]}}]})
+      :builds [{:id "dev"
+                :source-paths ["src"]
+                :compiler {:output-to "out/dev/app.js"
+                           :output-dir "out/dev"
+                           :optimizations :none
+                           :source-map true}}
+               {:id "release"
+                :source-paths ["src"]
+                :compiler {:output-dir "out/prod"
+                           :output-to "out/prod/app.js"
+                           :optimizations :advanced
+                           :elide-asserts true
+                           :pretty-print false
+                           :output-wrapper false
+                           :source-map "out/prod/app.js.map"
+                           :externs ["src/react-externs.js"]}}]})
 
